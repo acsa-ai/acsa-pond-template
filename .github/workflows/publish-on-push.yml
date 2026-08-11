@@ -1,0 +1,111 @@
+# Grade + sign this pond's claims and publish the signed, cold-verifiable
+# tree to GitHub Pages on every push to main.
+#
+# Requires ONE repository secret:
+#   POND_SIGNING_KEY -- base64 of the raw 32-byte private seed that
+#                       `sava_produce.py keygen` wrote to keys/pond.key.
+#                       Generate it once, locally:
+#                         base64 -w0 keys/pond.key   # Linux
+#                         base64    keys/pond.key    # macOS
+#                       then paste it into Settings -> Secrets -> Actions.
+#                       NEVER commit the key file itself.
+#
+# The producer and verifier ship IN this repo (pinned by sha256 below), so
+# nothing is fetched at build time. Actions are pinned to commit SHAs, not
+# mutable tags. This workflow publishes ONLY drops that verify cold.
+name: publish-on-push
+
+"on":
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'sava_produce.py'
+      - 'sava_verify.py'
+      - '.github/workflows/publish-on-push.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out this pond
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify the committed producer's sha256
+        run: |
+          actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_produce.py','rb').read()).hexdigest())")
+          expected=5676242714c34674a6b822188bf7ea0b7ac02926e009a0db5746b43888136175
+          if [ "$actual" != "$expected" ]; then
+            echo "sava_produce.py sha256 mismatch: got $actual, expected $expected" >&2
+            exit 1
+          fi
+
+      - name: Verify the committed verifier's sha256
+        run: |
+          actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_verify.py','rb').read()).hexdigest())")
+          expected=4fb6045a01d43912884018285d0e559c1a9560b822d79af1ae5bf1e6b5e9eec6
+          if [ "$actual" != "$expected" ]; then
+            echo "sava_verify.py sha256 mismatch: got $actual, expected $expected" >&2
+            exit 1
+          fi
+
+      - name: Restore the pond signing key
+        run: |
+          mkdir -p keys
+          echo "${{ secrets.POND_SIGNING_KEY }}" | base64 -d > keys/pond.key
+          chmod 600 keys/pond.key
+
+      - name: Grade and sign every claim
+        run: |
+          python3 sava_produce.py publish \
+            --pond src --key keys/pond.key --out out \
+            --graded-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      - name: Cold-verify every Drop and the head before publishing
+        run: |
+          pub=$(python3 -c "
+          import importlib.util
+          from pathlib import Path
+          spec = importlib.util.spec_from_file_location('_p', 'sava_produce.py')
+          m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          print(m.public_from_secret(Path('keys/pond.key').read_bytes()).hex())
+          ")
+          now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          for f in out/drops/*.json; do
+            echo "verifying $f"
+            python3 sava_verify.py drop "$f" --sources out/sources --trust "$pub" --json
+          done
+          python3 sava_verify.py head out/pond_head.json --trust "$pub" --now "$now" --json
+          # Actions runs each step under `bash -e`, so any non-zero
+          # sava_verify.py exit above already fails the job -- we never
+          # publish a tree that did not verify cold.
+
+      - name: Drop the key before packaging the site
+        run: rm -f keys/pond.key
+
+      - name: Configure Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload the signed pond tree
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

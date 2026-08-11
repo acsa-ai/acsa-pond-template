@@ -1,0 +1,10 @@
+# NEVER commit your signing key.
+keys/
+pond.key
+*.key
+
+# Generated pond tree (the Action rebuilds and publishes it).
+out/
+
+__pycache__/
+*.pyc

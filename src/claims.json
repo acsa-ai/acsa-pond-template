@@ -1,0 +1,14 @@
+[
+  {
+    "id": "claim-1",
+    "text": "The preamble to the United States Constitution states its purpose includes establishing justice and promoting the general welfare.",
+    "declared_type": "source_checkable",
+    "evidence_refs": [
+      {
+        "source_id": "preamble",
+        "quote": "establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty"
+      }
+    ],
+    "licensed_source_ids": ["preamble"]
+  }
+]
