@@ -20,7 +20,7 @@ python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read(
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_content_id.py
 # expect: f7cb109cbd16c1f9d3d509d04b89ac3a1fd2c4bf42715ab98f3f8ab43cdb1a8e
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_gate.py
-# expect: f9d826d2e6dcd5046b5b213bd86500959208c102f43c58656c3cf327b1de9609
+# expect: 1768ea4cc1eb2b71b27c48a13782185945b88735a3977bbabf78f3bf5d405724
 ```
 If a hash does not match, stop — do not run it.
 

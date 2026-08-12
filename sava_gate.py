@@ -30,6 +30,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Sibling tools this gate shells out to resolve relative to THIS script, not the
+# caller's CWD -- a pond author runs the gate from their own pond directory.
+_HERE = Path(__file__).resolve().parent
+
 
 def _leaf(cid_hex: str) -> bytes:
     return hashlib.sha256(b"\x00" + bytes.fromhex(cid_hex)).digest()
@@ -109,12 +113,24 @@ def main(argv=None) -> int:
     ap.add_argument("pond_dir", help="directory with pond_head.json and drops/*.json")
     ap.add_argument("--trust", required=True, help="the pond's public key, hex")
     ap.add_argument("--now", required=True, help="ISO8601 timestamp for head expiry check")
-    ap.add_argument("--verifier", default="./sava_verify.py", help="path to pinned sava_verify.py")
-    ap.add_argument("--contentid", default="./sava_content_id.py", help="path to pinned sava_content_id.py")
+    ap.add_argument("--verifier", default=None, help="path to pinned sava_verify.py (default: beside this script)")
+    ap.add_argument("--contentid", default=None, help="path to pinned sava_content_id.py (default: beside this script)")
     ap.add_argument("--out", default=None, help="write the JSON report to this file")
     args = ap.parse_args(argv)
 
-    report = gate(Path(args.pond_dir), args.trust, args.verifier, args.contentid, args.now)
+    verifier = Path(args.verifier) if args.verifier else _HERE / "sava_verify.py"
+    contentid = Path(args.contentid) if args.contentid else _HERE / "sava_content_id.py"
+    for tool, flag in ((verifier, "--verifier"), (contentid, "--contentid")):
+        if not tool.is_file():
+            print(
+                f"required tool not found: {tool}\n"
+                f"  put sava_verify.py and sava_content_id.py beside sava_gate.py, "
+                f"or pass {flag} <path>",
+                file=sys.stderr,
+            )
+            return 2
+
+    report = gate(Path(args.pond_dir), args.trust, str(verifier), str(contentid), args.now)
     if args.out:
         Path(args.out).write_text(json.dumps(report, indent=2))
     else:
