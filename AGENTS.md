@@ -68,7 +68,11 @@ If a hash does not match, stop — do not run it.
 4. **Publish:** commit your edits (not the key). Enable **Settings → Pages →
    Source = GitHub Actions**, add the `POND_SIGNING_KEY` secret
    (`base64 -w0 keys/pond.key`), and push. The workflow republishes the pond at
-   `https://<owner>.github.io/<repo>/`.
+   `https://<owner>.github.io/<repo>/` and writes `pubkey.hex` beside
+   `pond_head.json`, so anyone can anchor your key (`sha256(pubkey)[:16]` equals
+   the head's `key_fingerprint`) and cold-verify the pond from its own URL.
+   Hosting somewhere other than GitHub Pages? Publish `pubkey.hex` yourself:
+   `echo <public_key_hex from keygen> > out/pubkey.hex`.
 
 5. **Register + submit:**
    ```

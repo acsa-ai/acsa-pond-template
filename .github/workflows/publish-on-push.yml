@@ -91,6 +91,11 @@ jobs:
             python3 sava_verify.py drop "$f" --sources out/sources --trust "$pub" --json
           done
           python3 sava_verify.py head out/pond_head.json --trust "$pub" --now "$now" --json
+          # Everything above verified cold -> publish the pond's public key
+          # beside the head, so a consumer can anchor it (sha256(pubkey)[:16]
+          # equals the head's key_fingerprint) and cold-verify this pond
+          # standalone from its own URL, not only via the lake.
+          echo "$pub" > out/pubkey.hex
           # Actions runs each step under `bash -e`, so any non-zero
           # sava_verify.py exit above already fails the job -- we never
           # publish a tree that did not verify cold.
