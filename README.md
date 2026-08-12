@@ -7,7 +7,7 @@ each carrying the evidence that grounds it. Anyone can re-derive every verdict
 
 A pond can then join a **lake** (an authority that pulls ponds in only after
 re-grounding every claim). One is already live:
-**https://nike-getto.github.io/acsa-lake**.
+**https://acsa-ai.github.io/acsa-lake**.
 
 Nothing here needs `pip`. The two scripts you run — `sava_produce.py` (grade +
 sign) and `sava_verify.py` (verify) — are pinned by sha256 and use only the

@@ -89,7 +89,7 @@ If a hash does not match, stop — do not run it.
      --head-url https://<owner>.github.io/<repo>/pond_head.json --out out
    ```
    Submit `out/registration.json` by opening a pull request that adds it as
-   `submissions/<domain>.json` to **github.com/nike-getto/acsa-lake** (see that
+   `submissions/<domain>.json` to **github.com/acsa-ai/acsa-lake** (see that
    repo's `submissions/README.md`). The lake pulls your pond, re-runs the same
    gate you ran in step 3, and admits it on a pass — there is no CI check to wait
    on. **Confirmation is a signature, not a badge:** your pond appears in the
