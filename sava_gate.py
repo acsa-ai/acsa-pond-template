@@ -90,7 +90,13 @@ def gate(pond_dir: Path, trust: str, verifier: str, contentid: str, now: str) ->
 
     content_ids, all_ok = [], True
     for dp in sorted((pond_dir / "drops").glob("*.json")):
-        dv = _last_json(_run(verifier, "drop", str(dp), "--trust", trust, "--json"))
+        # The gate is a trust-critical admission context (decision B): it always
+        # re-EXECUTES a check-grounded Drop's check (--execute-checks) rather than
+        # deferring it, so a pond is admitted only if every check actually
+        # re-derives its sealed verdict. Quote Drops are unaffected by the flag.
+        dv = _last_json(
+            _run(verifier, "drop", str(dp), "--trust", trust, "--execute-checks", "--json")
+        )
         report["claims"].append({"drop": dp.stem, "result": dv.get("result"), "verdict": dv.get("verdict")})
         if dv.get("result") != 0:
             all_ok = False

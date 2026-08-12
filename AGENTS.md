@@ -14,13 +14,13 @@ anything.
 Before running any script, confirm it matches its pinned hash:
 ```
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_produce.py
-# expect: 5676242714c34674a6b822188bf7ea0b7ac02926e009a0db5746b43888136175
+# expect: 96ea99ea418f38d2ab1cc62afbd59fc7aa8ee3b21c230c5e81aa53becd90376e
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_verify.py
-# expect: 4fb6045a01d43912884018285d0e559c1a9560b822d79af1ae5bf1e6b5e9eec6
+# expect: e02585862616fb75156bcb0ba423275f446db7b61c66a2a2f12500b59429b020
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_content_id.py
 # expect: f7cb109cbd16c1f9d3d509d04b89ac3a1fd2c4bf42715ab98f3f8ab43cdb1a8e
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_gate.py
-# expect: 1768ea4cc1eb2b71b27c48a13782185945b88735a3977bbabf78f3bf5d405724
+# expect: 4c8088f17756a4354db38c789eadcf207ddcc5da80097c4db2c0ed1795df3c32
 ```
 If a hash does not match, stop — do not run it.
 
@@ -29,10 +29,19 @@ If a hash does not match, stop — do not run it.
 - `src/pond.json` — `{lake_id, pond_id, domain}`. Set `pond_id` to the human's
   chosen name and `domain` to `<pond_id>.ponds.acsa.ai` (the operator pins this
   label; the key is what carries authority).
-- `src/claims.json` — the claims. Evidence is **quote-only**: give `source_id`
-  and the exact `quote`; the producer finds it in the source and derives the
-  offset. Do not hand-write byte locators. The quote must occur once, verbatim.
-- `src/sources/<source_id>.txt` — the full text each claim cites.
+- `src/claims.json` — the claims. Most claims are **quote-grounded**: give
+  `source_id` and the exact `quote`; the producer finds it in the source and
+  derives the offset. Do not hand-write byte locators. The quote must occur once,
+  verbatim.
+  A code fact can instead be **check-grounded**: give a `check` field instead of
+  `evidence_refs` — a short deterministic Python snippet that binds `result` to
+  `True` (no imports, no I/O; runs under a resource cap). The producer *executes*
+  it to grade the claim, and the check source travels on the wire so a verifier
+  re-runs it. Example claim:
+  `{"id":"c1","text":"sorted([3,1,2]) == [1,2,3]","declared_type":"source_checkable","check":"result = (sorted([3, 1, 2]) == [1, 2, 3])"}`.
+  A check that does not execute to `True` grades as `not_established` (never
+  `false`). A check-only pond needs no `src/sources/`.
+- `src/sources/<source_id>.txt` — the full text each quote-grounded claim cites.
 - `sava_produce.py` / `sava_verify.py` / `sava_content_id.py` / `sava_gate.py`
   — pinned tools (above). `sava_gate.py` runs the lake's whole admission gate
   on your pond in one command (step 3).

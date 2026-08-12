@@ -49,7 +49,7 @@ jobs:
       - name: Verify the committed producer's sha256
         run: |
           actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_produce.py','rb').read()).hexdigest())")
-          expected=5676242714c34674a6b822188bf7ea0b7ac02926e009a0db5746b43888136175
+          expected=96ea99ea418f38d2ab1cc62afbd59fc7aa8ee3b21c230c5e81aa53becd90376e
           if [ "$actual" != "$expected" ]; then
             echo "sava_produce.py sha256 mismatch: got $actual, expected $expected" >&2
             exit 1
@@ -58,7 +58,7 @@ jobs:
       - name: Verify the committed verifier's sha256
         run: |
           actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_verify.py','rb').read()).hexdigest())")
-          expected=4fb6045a01d43912884018285d0e559c1a9560b822d79af1ae5bf1e6b5e9eec6
+          expected=e02585862616fb75156bcb0ba423275f446db7b61c66a2a2f12500b59429b020
           if [ "$actual" != "$expected" ]; then
             echo "sava_verify.py sha256 mismatch: got $actual, expected $expected" >&2
             exit 1
@@ -86,9 +86,14 @@ jobs:
           print(m.public_from_secret(Path('keys/pond.key').read_bytes()).hex())
           ")
           now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          # A check-only pond mirrors no sources, so pass --sources only when the
+          # dir exists. --execute-checks: this is the author's own CI verifying
+          # the author's own checks (a trust context, decision B), so a
+          # check-grounded Drop is re-executed here instead of reporting result 1.
+          src_flag=""; [ -d out/sources ] && src_flag="--sources out/sources"
           for f in out/drops/*.json; do
             echo "verifying $f"
-            python3 sava_verify.py drop "$f" --sources out/sources --trust "$pub" --json
+            python3 sava_verify.py drop "$f" $src_flag --trust "$pub" --execute-checks --json
           done
           python3 sava_verify.py head out/pond_head.json --trust "$pub" --now "$now" --json
           # Everything above verified cold -> publish the pond's public key
