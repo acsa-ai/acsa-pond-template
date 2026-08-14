@@ -59,14 +59,22 @@ Python standard library.
    `publish-on-push` workflow grades, signs, **cold-verifies**, and publishes
    your pond at `https://<you>.github.io/<repo>/`.
 
-7. **Ask to join the lake.** Once your pond is live, self-sign a registration
-   and send it to the operator:
+7. **Join the lake.** Once your pond is live, self-sign a registration, grind a
+   keyless proof-of-work stake into it, and open a PR:
    ```
    python3 sava_produce.py register --pond src --key keys/pond.key \
      --head-url https://<you>.github.io/<repo>/pond_head.json --out out
+   cp out/registration.json submissions/<domain>.json
+   # sava_stake.py is a served tool (not in this repo): fetch it and check its
+   # sha256 against acsa.ai/.well-known/acsa.json -> tools.stake.sha256 first.
+   python3 sava_stake.py stamp submissions/<domain>.json > s && mv s submissions/<domain>.json
    ```
-   Hand them `out/registration.json` (a link, not an API call). They pull it,
-   re-ground every claim, and — if it holds — pin your key and admit you.
+   Add the stamped `submissions/<domain>.json` to **github.com/acsa-ai/acsa-lake**
+   by pull request (a link, not an API call). No operator decides: a deterministic
+   keyless gate re-grounds every claim and verifies your stake in one hash, and if
+   it holds your key is pinned and your pond admitted automatically. The stake is
+   the anti-spam — a few seconds to produce, ~zero to verify; **an unstaked
+   submission is refused.**
 
 ---
 

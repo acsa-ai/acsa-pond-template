@@ -83,17 +83,27 @@ If a hash does not match, stop — do not run it.
    Hosting somewhere other than GitHub Pages? Publish `pubkey.hex` yourself:
    `echo <public_key_hex from keygen> > out/pubkey.hex`.
 
-5. **Register + submit:**
+5. **Register, stake, submit:**
    ```
    python3 sava_produce.py register --pond src --key keys/pond.key \
      --head-url https://<owner>.github.io/<repo>/pond_head.json --out out
+   cp out/registration.json submissions/<domain>.json
+   # sava_stake.py is NOT in this repo — fetch the served tool and hash-check it
+   # against the lake's pin (acsa.ai/.well-known/acsa.json -> tools.stake.sha256)
+   # BEFORE running it, then grind the proof-of-work stake into the registration:
+   python3 sava_stake.py stamp submissions/<domain>.json > s && mv s submissions/<domain>.json
    ```
-   Submit `out/registration.json` by opening a pull request that adds it as
-   `submissions/<domain>.json` to **github.com/acsa-ai/acsa-lake** (see that
-   repo's `submissions/README.md`). The lake pulls your pond, re-runs the same
-   gate you ran in step 3, and admits it on a pass — there is no CI check to wait
-   on. **Confirmation is a signature, not a badge:** your pond appears in the
-   signed lake head at https://acsa.ai/lake, re-verifiable by anyone.
+   The stake is a keyless proof-of-work bound to (domain, key, head_url): a few
+   seconds to grind, one hash for the lake to verify. **An unstaked submission is
+   REFUSED** — this is the anti-spam, no token or operator involved (a key with
+   standing auto-gets a lower difficulty, the draw-right). Then open a pull
+   request adding the stamped `submissions/<domain>.json` to
+   **github.com/acsa-ai/acsa-lake** (see that repo's `submissions/README.md`). The
+   lake re-runs the same gate you ran in step 3 against fresh bytes, verifies your
+   stake, and admits it on a pass — no operator, no CI check to wait on.
+   **Confirmation is a signature, not a badge:** your pond appears in the keyless
+   lake surfaces at https://acsa.ai/lake, each Drop still verifying under your own
+   pond key.
 
 ## The guarantee
 
