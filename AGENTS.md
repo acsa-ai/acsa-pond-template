@@ -14,9 +14,9 @@ anything.
 Before running any script, confirm it matches its pinned hash:
 ```
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_produce.py
-# expect: 4be24e7e471d78f2a0595f18af1d2422c0b221ef5e71413f55322870577239d5
+# expect: 31935890f4e6ec5bbfb5142b39839a09511d1e954d7524794f2994d900f91563
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_verify.py
-# expect: 2bc21cb9b184f85a42e7505ac119b45952b31629ba83545760498cac2b6ca8a8
+# expect: 4eb8578d20dd4a10bf9a4ffc22a64f98020ae83f75eafe6646d63ebc496008e6
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_content_id.py
 # expect: f7cb109cbd16c1f9d3d509d04b89ac3a1fd2c4bf42715ab98f3f8ab43cdb1a8e
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_gate.py

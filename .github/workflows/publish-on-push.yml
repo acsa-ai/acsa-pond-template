@@ -49,7 +49,7 @@ jobs:
       - name: Verify the committed producer's sha256
         run: |
           actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_produce.py','rb').read()).hexdigest())")
-          expected=4be24e7e471d78f2a0595f18af1d2422c0b221ef5e71413f55322870577239d5
+          expected=31935890f4e6ec5bbfb5142b39839a09511d1e954d7524794f2994d900f91563
           if [ "$actual" != "$expected" ]; then
             echo "sava_produce.py sha256 mismatch: got $actual, expected $expected" >&2
             exit 1
@@ -58,7 +58,7 @@ jobs:
       - name: Verify the committed verifier's sha256
         run: |
           actual=$(python3 -c "import hashlib; print(hashlib.sha256(open('sava_verify.py','rb').read()).hexdigest())")
-          expected=2bc21cb9b184f85a42e7505ac119b45952b31629ba83545760498cac2b6ca8a8
+          expected=4eb8578d20dd4a10bf9a4ffc22a64f98020ae83f75eafe6646d63ebc496008e6
           if [ "$actual" != "$expected" ]; then
             echo "sava_verify.py sha256 mismatch: got $actual, expected $expected" >&2
             exit 1
