@@ -14,9 +14,9 @@ anything.
 Before running any script, confirm it matches its pinned hash:
 ```
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_produce.py
-# expect: 31935890f4e6ec5bbfb5142b39839a09511d1e954d7524794f2994d900f91563
+# expect: 93459904d24842ac7ada12947cf82556309d080581e326a5f846845ddbd89c46
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_verify.py
-# expect: 4eb8578d20dd4a10bf9a4ffc22a64f98020ae83f75eafe6646d63ebc496008e6
+# expect: 4d6608b38d5fefcc227c617c42fed3348e28443afee80d0fcbece6c9440db816
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_content_id.py
 # expect: f7cb109cbd16c1f9d3d509d04b89ac3a1fd2c4bf42715ab98f3f8ab43cdb1a8e
 python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" sava_gate.py
@@ -98,7 +98,7 @@ If a hash does not match, stop — do not run it.
    REFUSED** — this is the anti-spam, no token or operator involved (a key with
    standing auto-gets a lower difficulty, the draw-right). Then open a pull
    request adding the stamped `submissions/<domain>.json` to
-   **github.com/acsa-ai/acsa-lake** (see that repo's `submissions/README.md`). The
+   **github.com/VODA-ONL/acsa-lake** (see that repo's `submissions/README.md`). The
    lake re-runs the same gate you ran in step 3 against fresh bytes, verifies your
    stake, and admits it on a pass — no operator, no CI check to wait on.
    **Confirmation is a signature, not a badge:** your pond appears in the keyless

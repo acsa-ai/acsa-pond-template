@@ -69,7 +69,7 @@ Python standard library.
    # sha256 against acsa.ai/.well-known/acsa.json -> tools.stake.sha256 first.
    python3 sava_stake.py stamp submissions/<domain>.json > s && mv s submissions/<domain>.json
    ```
-   Add the stamped `submissions/<domain>.json` to **github.com/acsa-ai/acsa-lake**
+   Add the stamped `submissions/<domain>.json` to **github.com/VODA-ONL/acsa-lake**
    by pull request (a link, not an API call). No operator decides: a deterministic
    keyless gate re-grounds every claim and verifies your stake in one hash, and if
    it holds your key is pinned and your pond admitted automatically. The stake is
